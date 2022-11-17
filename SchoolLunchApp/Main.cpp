@@ -11,11 +11,11 @@ void loadUserInformation();
 void writeUserInformation(string username, string password, bool adminState);
 void createLoginScreen();
 void createMainMenu();
-void createFoodMenu(); // TODO Create a definition for this function and fill out the logic.
+double createFoodMenu();
 void modifyUserAccount();
 void loadUserChangeMenu();
 void createNewUser();
-void payForItem(); // TODO Create a definition for this function and fill out the logic.  
+void payForItem(double totalCost);
 
 // Global variables:
 bool isAdmin = false;
@@ -31,6 +31,8 @@ int main() {
 	loadUserInformation();
 
 	createLoginScreen();
+
+	createFoodMenu();
 
 	return 0;
 }
@@ -123,8 +125,9 @@ void createMainMenu() {
 	}
 }
 
-void createFoodMenu() {
-	//Menu Variables
+double createFoodMenu() {
+
+	// Menu Variables
 	char pizza1[] = "Cheese", pizza2[] = "Meatlovers", pizza3[] = "Supreme";
 	char drinks1[] = "Sprite", drinks2[] = "Coke", drinks3[] = "Orange Juice";
 	char burger1[] = "Cheese Burger", burger2[] = "Chicken Burger", burger3[] = "Fish Burger";
@@ -148,7 +151,7 @@ start:
 	cout << "[3] Sandwich\n";
 	cout << "[4] Drinks\n";
 	cout << "[5] Fried Food\n";
-	cout << "[6] Display Total Bill\n";
+	cout << "[6] Display Final Bill & Proceed to Payment\n";
 	cout << "\nPlease Enter your Choice: ";
 	cin >> option;
 
@@ -203,7 +206,8 @@ start:
 				break;
 
 			}
-			cout << "Would you like to order anything else?";
+			//Return back to menu
+			cout << "\nWould you like to order anything else?";
 			cout << "\nPress Y to return back to menu: ";
 			cin >> gotoBeginning;
 			if (gotoBeginning == 'Y' || gotoBeginning == 'y')
@@ -265,6 +269,7 @@ start:
 
 
 			}
+			//Return back to menu
 			cout << "\nWould you like to order anything else?";
 			cout << "\nPress Y to return back to menu: ";
 			cin >> gotoBeginning;
@@ -324,7 +329,8 @@ start:
 
 
 			}
-			cout << "Would you like to order anything else?";
+			//Return back to menu
+			cout << "\nWould you like to order anything else?";
 			cout << "\nPress Y to return back to menu: ";
 			cin >> gotoBeginning;
 			if (gotoBeginning == 'Y' || gotoBeginning == 'y')
@@ -382,7 +388,8 @@ start:
 
 
 			}
-			cout << "Would you like to order anything else?";
+			//Return back to menu
+			cout << "\nWould you like to order anything else?";
 			cout << "\nPress Y to return back to menu: ";
 			cin >> gotoBeginning;
 			if (gotoBeginning == 'Y' || gotoBeginning == 'y')
@@ -440,7 +447,8 @@ start:
 
 
 			}
-			cout << "Would you like to order anything else?";
+			//Return back to menu
+			cout << "\nWould you like to order anything else?";
 			cout << "\nPress Y to return back to menu: ";
 			cin >> gotoBeginning;
 			if (gotoBeginning == 'Y' || gotoBeginning == 'y')
@@ -453,26 +461,26 @@ start:
 
 
 	else if (option == 6) {
-
+	//Payment Calculation & Proceed to payment function.
 		double totalCost = pizzaPrice + drinkPrice + burgerPrice + sandwichPrice + friedPrice;
 
 		system("cls");
 
-		cout << "Total order amount is: $" << totalCost << endl;
-		cout << "\nPress Y to return back to menu: ";
+		cout << "\nTotal order amount is: $" << totalCost << endl;
+		cout << "\nPress Y to proceed to payment: ";
 		cin >> gotoBeginning;
 
 		if (gotoBeginning == 'Y' || gotoBeginning == 'y')
 		{
-			goto start;
+			payForItem(totalCost);
 			return totalCost;
 		}
 	}
 	else
 	{
 		system("cls");
-		cout << "Invaild Selection, please choose from the options available. \n";
-		cout << "Would You like to try to order again? Y / N: ";
+		cout << "\nInvaild Selection, please choose from the options available.";
+		cout << "\nWould You like to try to order again? Y / N: ";
 		cin >> gotoBeginning;
 
 		if (gotoBeginning == 'Y' || gotoBeginning == 'y')
@@ -481,6 +489,8 @@ start:
 
 		}
 	}
+
+	return 0;
 
 }
 
@@ -584,6 +594,78 @@ void writeUserInformation(string username, string password, bool adminState) {
 
 }
 
-void payForItem() {
+void payForItem(double totalCost) {
+	 
+	double total = totalCost;
+	int payOption = 0;
+	string cardName;
+	string cardNum;
+	double cardExp;
+	int cardCVV;
 
+	//Payment Option Menu
+	system("cls");
+	cout << "\nYour Order total comes to: $" << total;
+	cout << "\nHow would you like to pay?" << endl;
+	cout << "[1] Credit Card\n";
+	cout << "[2] Cash on Pick up\n";
+	cout << "[3] Eftpos\n";
+	cout << "Choose Payment Option: ";
+	cin >> payOption;
+
+	//Payment Option: Credit Card
+	if (payOption == 1) {
+	start:
+		system("cls");
+
+		cout << "\nPlease Enter your credit card details: ";
+		cout << "\nName on card: " << endl;
+		cin >> cardName;
+		cout << "\nCard No.: " << endl;
+		cin >> cardNum;
+		cout << "\nCard Expiry (e.g., 02.24): " << endl;
+		cin >> cardExp;
+		cout << "\nCard CVV:" << endl;
+		cin >> cardCVV;
+
+		if (cardNum, cardName == "" || cardExp, cardCVV == 0) {
+			cout << "\nIncorrect Card Details, please try again.";
+			goto start;
+		}
+		else {
+			cout << "\n\nPayment Accepted!";
+
+			cout << "\n\nYour Order will be ready by 12.00pm";
+			cout << "\n\nPick up Address is Some School, 1234 Some Street, Somewhere, Your country";
+			cout << "\n\nIf you have any issues with your order, please contact us by email or phone.";
+			cout << "\nPh: 018-985-1153, email: Someschool@schoolmail.com" << endl;
+		}
+	}
+	//Payment Option: Cash
+	if (payOption == 2) {
+		cout << "\nPayment Method: Cash";
+		cout << "\nTotal amount due is: " << total;
+		cout << "\nPlease have payment ready at pick-up";
+
+		cout << "\n\nYour Order will be ready by 12.00pm";
+		cout << "\n\nPick up Address is Some School, 1234 Some Street, Somewhere, Your country";
+		cout << "\n\nIf you have any issues with your order, please contact us by email or phone.";
+		cout << "\nPh: 018-985-1153, email: Someschool@schoolmail.co.nz" << endl;
+
+
+	}
+	//Payment Option: EFTPOS
+	if (payOption == 3) {
+		cout << "\nPayment Method: EFTPOS";
+		cout << "\nTotal amount due is: " << total;
+		cout << "\nPlease have payment ready at pick-up";
+
+		cout << "\n\nYour Order will be ready by 12.00pm";
+		cout << "\n\nPick up Address is Some School, 1234 Some Street, Somewhere, Your country";
+		cout << "\n\nIf you have any issues with your order, please contact us by email or phone.";
+		cout << "\nPh: 018-985-1153, email: Someschool@schoolmail.co.nz" << endl;
+
+
+	}
+	
 }

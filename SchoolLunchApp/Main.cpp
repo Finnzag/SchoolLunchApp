@@ -16,12 +16,16 @@ double createFoodMenu();
 void modifyUserAccount();
 void changeAccountData(string& username, int userID);
 void loadUserChangeMenu();
+void removeUserAccount();
 void createNewUser();
-void payForItem(double totalCost); 
-void generateReceipt(); // TODO Write function to generate reports
+void payForItem(double totalCost);
+double discountItem(double fullPrice, float discountAmount);
 
 // Global variables:
 bool isAdmin = false;
+bool isDiscounted = false;
+float discountAmount = 0.0;
+int loginAttempts = 0;
 
 vector<string> usernameArray{};
 vector<string> passwordArray{};
@@ -35,17 +39,27 @@ int main() {
 
 	createLoginScreen();
 
-	createFoodMenu();
-
 	return 0;
 }
 
 void createLoginScreen() {
 	string username;
 	string password;
+	
 
 	string usernameToCompare = "Finn";
 	string passwordToCompare = "Password1234";
+
+	loginAttempts++;
+
+	if (loginAttempts > 3)
+	{
+		cout << "\n\nYou have failed to login the maximum number of times. The program will now close\n\n.";
+		exit(1);
+	}
+
+
+	cout << loginAttempts;
 
 
 	cout << "School Lunch App" << endl;
@@ -75,19 +89,23 @@ void createLoginScreen() {
 
 	}
 
+	cout << "\n\nUsername not found please try again\n\n";
+	createLoginScreen();
+
 }
 
 void createMainMenu() {
 	system("cls");
 	cout << "School Lunch App\n\n" << endl;
-	char menuItemSelected;
+	char menuItemSelected = ' ';
 
 	if (isAdmin)
 	{
 		cout << "Please select and option: \n\n";
 		cout << "a. menu\n";
 		cout << "b. add or edit a user\n";
-		cout << "c. exit\n\n";
+		cout << "c. enable discoutns\n";
+		cout << "d. exit\n\n";
 
 		cin >> menuItemSelected;
 
@@ -100,6 +118,27 @@ void createMainMenu() {
 			loadUserChangeMenu();
 			break;
 		case 'c':
+			char discountenabled;
+			cout << "Do you want to enable a discount Y/N? \n\n";
+			cin >> discountenabled;
+			if (discountenabled == 'Y' || discountenabled == 'y')
+			{
+				isDiscounted = true;
+				cout << "Please enter the discount account from 1% -> 100%: \n";
+				cin >> discountAmount;
+				ofstream discountFile;
+				discountFile.open("discounts", ios::trunc | ios::out | ios::ate);
+				discountFile << endl << isDiscounted << endl << discountAmount;
+				discountFile.close();
+				createMainMenu();
+			}
+			else
+			{
+				isDiscounted = false;
+				createMainMenu();
+			}
+			break;
+		case 'd':
 			for (size_t i = 0; i < usernameArray.size(); i++)
 			{
 				saveUserDataOnExit(usernameArray[i], passwordArray[i], adminStateArray[i], i);
@@ -107,6 +146,7 @@ void createMainMenu() {
 			exit(1);
 			break;
 		default:
+			createMainMenu();
 			break;
 		}
 	}
@@ -127,6 +167,7 @@ void createMainMenu() {
 			exit(1);
 			break;
 		default:
+			createMainMenu();
 			break;
 		}
 	}
@@ -222,6 +263,10 @@ start:
 				goto start;
 
 			}
+			else
+			{
+				goto start;
+			}
 
 
 
@@ -285,6 +330,10 @@ start:
 				goto start;
 
 			}
+			else
+			{
+				goto start;
+			}
 
 		}
 	}
@@ -345,6 +394,10 @@ start:
 				goto start;
 
 			}
+			else
+			{
+				goto start;
+			}
 		}
 	}
 
@@ -403,6 +456,10 @@ start:
 			{
 				goto start;
 
+			}
+			else
+			{
+				goto start;
 			}
 		}
 	}
@@ -463,6 +520,10 @@ start:
 				goto start;
 
 			}
+			else
+			{
+				goto start;
+			}
 		}
 	}
 
@@ -482,6 +543,10 @@ start:
 			payForItem(totalCost);
 			return totalCost;
 		}
+		else
+		{
+			goto start;
+		}
 	}
 	else
 	{
@@ -496,8 +561,6 @@ start:
 
 		}
 	}
-
-	return 0;
 
 }
 
@@ -524,9 +587,30 @@ void loadUserChangeMenu() {
 		modifyUserAccount();
 		break;
 	case 'c':
+		removeUserAccount();
 		break;
 	default:
 		break;
+	}
+}
+
+void removeUserAccount() {
+	system("cls");
+	string userToBeRemoved;
+	cout << "School Lunch App" << endl;
+
+	cout << "\n\n Which user would you like to remove ?\n";
+	cin >> userToBeRemoved;
+
+	for (size_t i = 0; i < usernameArray.size(); i++)
+	{
+		if (usernameArray[i] == userToBeRemoved) {
+			usernameArray.erase(usernameArray.begin() + i);
+			passwordArray.erase(passwordArray.begin() + i);
+			adminStateArray.erase(adminStateArray.begin() + i);
+			cout << "User Account Removed!!";
+			createMainMenu();
+		}
 	}
 }
 
@@ -624,6 +708,19 @@ void createNewUser() {
 
 	cout << "\n\n Would you like to create another user ? Y or N";
 
+	char optionSelected = ' ';
+
+	cin >> optionSelected;
+
+	if (optionSelected == 'Y' || optionSelected == 'y')
+	{
+		createNewUser();
+	}
+	else
+	{
+		createMainMenu();
+	}
+
 
 }
 
@@ -637,6 +734,7 @@ void loadUserInformation() {
 	ifstream fileUsername("username");
 	ifstream filePassword("password");
 	ifstream fileAdminState("adminState");
+	ifstream fileDiscounts("discounts");
 
 	// Transfer the user infiormation from the temp variables to their resptive arrays
 	while (fileUsername >> readInUsername)
@@ -647,6 +745,10 @@ void loadUserInformation() {
 		fileAdminState >> readInAdminState;
 		adminStateArray.push_back(readInAdminState);
 	}
+
+	fileDiscounts >> isDiscounted >> discountAmount;
+
+
 }
 
 void writeUserInformation(string username, string password, bool adminState) {
@@ -669,17 +771,26 @@ void writeUserInformation(string username, string password, bool adminState) {
 }
 
 void payForItem(double totalCost) {
-	 
+
 	double total = totalCost;
 	int payOption = 0;
 	string cardName;
 	string cardNum;
 	double cardExp;
 	int cardCVV;
+	char menuSelection = ' ';
 
 	//Payment Option Menu
 	system("cls");
-	cout << "\nYour Order total comes to: $" << total;
+	
+	if (isDiscounted == true)
+	{
+		cout << "\nYour Order total comes to: $" << discountItem(total, discountAmount);
+	}
+	else
+	{
+		cout << "\nYour Order total comes to: $" << total;
+	}
 	cout << "\nHow would you like to pay?" << endl;
 	cout << "[1] Credit Card\n";
 	cout << "[2] Cash on Pick up\n";
@@ -702,7 +813,7 @@ void payForItem(double totalCost) {
 		cout << "\nCard CVV:" << endl;
 		cin >> cardCVV;
 
-		if (cardNum, cardName == "" || cardExp, cardCVV == 0) {
+		if (cardNum == " " || cardName == " " || cardExp == 0 || cardCVV == 0) {
 			cout << "\nIncorrect Card Details, please try again.";
 			goto start;
 		}
@@ -713,6 +824,19 @@ void payForItem(double totalCost) {
 			cout << "\n\nPick up Address is Some School, 1234 Some Street, Somewhere, Your country";
 			cout << "\n\nIf you have any issues with your order, please contact us by email or phone.";
 			cout << "\nPh: 018-985-1153, email: Someschool@schoolmail.com" << endl;
+			
+			cout << "\n\n Would you like to logout ? Y/N\n\n";
+
+			cin >> menuSelection;
+
+			if (menuSelection == 'Y' || menuSelection == 'y')
+			{
+				exit(1);
+			}
+			else
+			{
+				createMainMenu();
+			}
 		}
 	}
 	//Payment Option: Cash
@@ -725,6 +849,19 @@ void payForItem(double totalCost) {
 		cout << "\n\nPick up Address is Some School, 1234 Some Street, Somewhere, Your country";
 		cout << "\n\nIf you have any issues with your order, please contact us by email or phone.";
 		cout << "\nPh: 018-985-1153, email: Someschool@schoolmail.co.nz" << endl;
+
+		cout << "\n\n Would you like to logout ? Y/N\n\n";
+
+		cin >> menuSelection;
+
+		if (menuSelection == 'Y' || menuSelection == 'y')
+		{
+			exit(1);
+		}
+		else
+		{
+			createMainMenu();
+		}
 
 
 	}
@@ -739,10 +876,34 @@ void payForItem(double totalCost) {
 		cout << "\n\nIf you have any issues with your order, please contact us by email or phone.";
 		cout << "\nPh: 018-985-1153, email: Someschool@schoolmail.co.nz" << endl;
 
+		// TODO add logout functionality
+
+		cout << "\n\n Would you like to logout ? Y/N\n\n";
+		cin >> menuSelection;
+
+		if (menuSelection == 'Y' || menuSelection == 'y')
+		{
+			exit(1);
+		}
+		else
+		{
+			createMainMenu();
+		}
+
 
 	}
+}
+
+double discountItem(double fullPrice, float discountAmount)
+{
+	float discountPercentage = (discountAmount / 100);
+	double discountedAmount = (fullPrice * discountPercentage);
+	double discountedPrice = (fullPrice - discountedAmount);
+	return discountedPrice;
+}
 	
-void saveUserDataOnExit(string username, string password, bool adminState, int runID) {
+void saveUserDataOnExit(string username, string password, bool adminState, int runID) 
+{
 	ofstream usernameFile;
 	ofstream passwordFile;
 	ofstream adminStateFile;
@@ -769,8 +930,4 @@ void saveUserDataOnExit(string username, string password, bool adminState, int r
 	usernameFile.close();
 	passwordFile.close();
 	adminStateFile.close();
-}
-
-void generateReceipt() {
-
 }

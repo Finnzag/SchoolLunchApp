@@ -9,20 +9,23 @@ using namespace std;
 // Function declarations:
 void loadUserInformation();
 void writeUserInformation(string username, string password, bool adminState);
+void saveUserDataOnExit(string username, string password, bool adminState, int runID);
 void createLoginScreen();
 void createMainMenu();
 double createFoodMenu();
 void modifyUserAccount();
+void changeAccountData(string& username, int userID);
 void loadUserChangeMenu();
 void createNewUser();
-void payForItem(double totalCost);
+void payForItem(double totalCost); 
+void generateReceipt(); // TODO Write function to generate reports
 
 // Global variables:
 bool isAdmin = false;
 
 vector<string> usernameArray{};
 vector<string> passwordArray{};
-vector<bool> adminStateArray{true, false};
+vector<bool> adminStateArray{};
 
 
 
@@ -97,6 +100,10 @@ void createMainMenu() {
 			loadUserChangeMenu();
 			break;
 		case 'c':
+			for (size_t i = 0; i < usernameArray.size(); i++)
+			{
+				saveUserDataOnExit(usernameArray[i], passwordArray[i], adminStateArray[i], i);
+			}
 			exit(1);
 			break;
 		default:
@@ -504,7 +511,8 @@ void loadUserChangeMenu() {
 	cout << "Would you like to create or modify an account ?\n\n";
 
 	cout << "a. Create new account\n";
-	cout << "b. Modify Existing account\n\n";
+	cout << "b. Modify Existing account\n";
+	cout << "c. Remove account\n\n";
 	cin >> menuSelection;
 
 	switch (menuSelection)
@@ -515,13 +523,81 @@ void loadUserChangeMenu() {
 	case 'b':
 		modifyUserAccount();
 		break;
+	case 'c':
+		break;
 	default:
 		break;
 	}
 }
 
+void changeAccountData(string& username, int userID) {
+	system("cls");
+
+	char menuSelection;
+	string newUsername;
+	string newPassword;
+	bool newAdminState;
+
+	cout << "School Lunch App" << endl;
+
+	if (username == usernameArray[userID]) {
+		cout << "Please select what you would like to change: \n";
+		cout << "a. Username\n";
+		cout << "b. Password\n";
+		cout << "c. Admin State\n";
+
+		cin >> menuSelection;
+
+		switch (menuSelection)
+		{
+		case 'a':
+			cout << "\nPlease enter the new username: \n";
+			cin >> newUsername;
+			usernameArray[userID] = newUsername;
+			createMainMenu();
+			break;
+		case 'b':
+			cout << "\nPlease enter the new password: \n";
+			cin >> newPassword;
+			passwordArray[userID] = newPassword;
+			createMainMenu();
+			break;
+		case 'c':
+			cout << "\n Please enter a new admin state: \n";
+			cin >> newAdminState;
+			adminStateArray[userID] = newAdminState;
+			createMainMenu();
+			break;
+		default:
+			changeAccountData(username, userID);
+			break;
+		}
+	}
+}
+
 void modifyUserAccount() {
-	
+	string userToBeChanged = " ";
+
+	cout << "School Lunch App" << endl;
+
+	cout << "\n Please enter the name of the uer you would like to change: \n";
+	cin >> userToBeChanged;
+
+	for (size_t i = 0; i < usernameArray.size(); i++)
+	{
+		cout << i;
+		if (userToBeChanged == usernameArray[i]) {
+			cout << usernameArray[i];
+			changeAccountData(userToBeChanged, i);
+
+		}
+		else if (i >= usernameArray.size())
+		{
+			cout << "User could not be found. Please Try again.\n";
+			modifyUserAccount();
+
+		}
+	}
 }
 
 void createNewUser() {
@@ -540,9 +616,13 @@ void createNewUser() {
 	cout << "\n Is this user an admin ? True(1) or false (0): ";
 	cin >> adminStatus;
 
+	usernameArray.push_back(username);
+	passwordArray.push_back(password);
+	adminStateArray.push_back(adminStatus);
+
 	writeUserInformation(username, password, adminStatus);
 
-	cout << "\n\n Would you like tot create another user ? Y or N";
+	cout << "\n\n Would you like to create another user ? Y or N";
 
 
 }
@@ -562,15 +642,9 @@ void loadUserInformation() {
 	while (fileUsername >> readInUsername)
 	{
 		usernameArray.push_back(readInUsername);
-	}
-
-	while (filePassword >> readInPassword)
-	{
+		filePassword >> readInPassword;
 		passwordArray.push_back(readInPassword);
-	}
-
-	while (fileAdminState >> readInAdminState)
-	{
+		fileAdminState >> readInAdminState;
 		adminStateArray.push_back(readInAdminState);
 	}
 }
@@ -668,4 +742,35 @@ void payForItem(double totalCost) {
 
 	}
 	
+void saveUserDataOnExit(string username, string password, bool adminState, int runID) {
+	ofstream usernameFile;
+	ofstream passwordFile;
+	ofstream adminStateFile;
+
+	if (runID > 0)
+	{
+		usernameFile.open("username", ios::out | ios::ate | ios::app);
+		passwordFile.open("password", ios::out | ios::ate | ios::app);
+		adminStateFile.open("adminState", ios::out | ios::ate | ios::app);
+	}
+	else
+	{
+		usernameFile.open("username", ios::trunc | ios::out | ios::ate);
+		passwordFile.open("password", ios::trunc | ios::out | ios::ate);
+		adminStateFile.open("adminState", ios::trunc | ios::out | ios::ate);
+	}
+
+	
+
+	usernameFile << endl << username;
+	passwordFile << endl << password;
+	adminStateFile << endl << adminState;
+
+	usernameFile.close();
+	passwordFile.close();
+	adminStateFile.close();
+}
+
+void generateReceipt() {
+
 }

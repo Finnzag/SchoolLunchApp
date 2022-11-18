@@ -18,6 +18,7 @@ void changeAccountData(string& username, int userID);
 void loadUserChangeMenu();
 void createNewUser();
 void payForItem(); // TODO Create a definition for this function and fill out the logic.  
+void generateReceipt(); // TODO Write function to generate reports
 
 // Global variables:
 bool isAdmin = false;
@@ -129,10 +130,6 @@ void createMainMenu() {
 	}
 }
 
-void createFoodMenu() {
-
-}
-
 void loadUserChangeMenu() {
 	char menuSelection = ' ';
 
@@ -143,7 +140,8 @@ void loadUserChangeMenu() {
 	cout << "Would you like to create or modify an account ?\n\n";
 
 	cout << "a. Create new account\n";
-	cout << "b. Modify Existing account\n\n";
+	cout << "b. Modify Existing account\n";
+	cout << "c. Remove account\n\n";
 	cin >> menuSelection;
 
 	switch (menuSelection)
@@ -153,6 +151,8 @@ void loadUserChangeMenu() {
 		break;
 	case 'b':
 		modifyUserAccount();
+		break;
+	case 'c':
 		break;
 	default:
 		break;
@@ -251,7 +251,7 @@ void createNewUser() {
 
 	writeUserInformation(username, password, adminStatus);
 
-	cout << "\n\n Would you like tot create another user ? Y or N";
+	cout << "\n\n Would you like to create another user ? Y or N";
 
 
 }
@@ -326,5 +326,13 @@ void saveUserDataOnExit(string username, string password, bool adminState, int r
 	adminStateFile.close();
 }
 void payForItem() {
+
+}
+
+void generateReceipt() {
+
+}
+
+void createFoodMenu() {
 
 }

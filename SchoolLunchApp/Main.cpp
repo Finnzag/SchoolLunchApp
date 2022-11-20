@@ -7,19 +7,19 @@
 using namespace std;
 
 // Function declarations:
-void loadUserInformation();
-void writeUserInformation(string username, string password, bool adminState);
-void saveUserDataOnExit(string username, string password, bool adminState, int runID);
-void createLoginScreen();
+void loadUserInformation(); // Loads user information from file when program starts
+void writeUserInformation(string username, string password, bool adminState); // writes user information to file when creating a new user
+void saveUserDataOnExit(string username, string password, bool adminState, int runID); // writes user information to file when the program exits
+void createLoginScreen(); 
 void createMainMenu();
 double createFoodMenu();
-void modifyUserAccount();
-void changeAccountData(string& username, int userID);
-void loadUserChangeMenu();
-void removeUserAccount();
+void modifyUserAccount(); // asks for a name and them checks if it exists. If true then the changeAccountData(string& username, int userID) functions gets executed
+void changeAccountData(string& username, int userID); // function to change data for a user
+void loadUserChangeMenu(); 
+void removeUserAccount(); // removed user account from the user arrays
 void createNewUser();
 void payForItem(double totalCost);
-double discountItem(double fullPrice, float discountAmount);
+double discountItem(double fullPrice, float discountAmount); // enables discounts
 
 // Global variables:
 bool isAdmin = false;
@@ -57,9 +57,6 @@ void createLoginScreen() {
 		cout << "\n\nYou have failed to login the maximum number of times. The program will now close\n\n.";
 		exit(1);
 	}
-
-
-	cout << loginAttempts;
 
 
 	cout << "School Lunch App" << endl;
@@ -737,14 +734,22 @@ void loadUserInformation() {
 	ifstream fileDiscounts("discounts");
 
 	// Transfer the user infiormation from the temp variables to their resptive arrays
-	while (fileUsername >> readInUsername)
+	if (fileUsername && filePassword && fileAdminState && fileDiscounts)
 	{
-		usernameArray.push_back(readInUsername);
-		filePassword >> readInPassword;
-		passwordArray.push_back(readInPassword);
-		fileAdminState >> readInAdminState;
-		adminStateArray.push_back(readInAdminState);
+		while (fileUsername >> readInUsername)
+		{
+			usernameArray.push_back(readInUsername);
+			filePassword >> readInPassword;
+			passwordArray.push_back(readInPassword);
+			fileAdminState >> readInAdminState;
+			adminStateArray.push_back(readInAdminState);
+		}
 	}
+	else
+	{
+		cout << "File load issue. the username, password, adminState and discounts files are present\n\n";
+	}
+	
 
 	fileDiscounts >> isDiscounted >> discountAmount;
 
@@ -785,7 +790,8 @@ void payForItem(double totalCost) {
 	
 	if (isDiscounted == true)
 	{
-		cout << "\nYour Order total comes to: $" << discountItem(total, discountAmount);
+		total = discountItem(total, discountAmount);
+		cout << "\nYour Order total comes to: $" << total;
 	}
 	else
 	{
@@ -842,7 +848,7 @@ void payForItem(double totalCost) {
 	//Payment Option: Cash
 	if (payOption == 2) {
 		cout << "\nPayment Method: Cash";
-		cout << "\nTotal amount due is: " << total;
+		cout << "\nTotal amount due is: $" << total;
 		cout << "\nPlease have payment ready at pick-up";
 
 		cout << "\n\nYour Order will be ready by 12.00pm";
@@ -868,7 +874,7 @@ void payForItem(double totalCost) {
 	//Payment Option: EFTPOS
 	if (payOption == 3) {
 		cout << "\nPayment Method: EFTPOS";
-		cout << "\nTotal amount due is: " << total;
+		cout << "\nTotal amount due is: $" << total;
 		cout << "\nPlease have payment ready at pick-up";
 
 		cout << "\n\nYour Order will be ready by 12.00pm";
